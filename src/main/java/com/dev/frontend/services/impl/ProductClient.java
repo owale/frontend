@@ -15,24 +15,24 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import com.dev.frontend.model.Customer;
+import com.dev.frontend.model.Product;
 import com.dev.frontend.services.Services;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class CustomerClient {
+public class ProductClient {
 
-	private static final String API_URL = Services.REST_API_URL + "/customer/";
+	private static final String API_URL = Services.REST_API_URL + "/product/";
 	private static Gson gson = new Gson();
 
 	private static HttpClient client = new DefaultHttpClient();
 
 	// TODO move shared code to Generic Class
 
-	public static Customer create(Customer customer) {
+	public static Product create(Product product) {
 		HttpPost httppost = new HttpPost(API_URL);
 		try {
-			StringEntity se = new StringEntity(gson.toJson(customer));
+			StringEntity se = new StringEntity(gson.toJson(product));
 			se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,
 					"application/json"));
 			httppost.setHeader(new BasicHeader(HTTP.CONTENT_TYPE,
@@ -43,9 +43,9 @@ public class CustomerClient {
 			HttpResponse response = client.execute(httppost);
 
 			if (response.getStatusLine().getStatusCode() == 200) {
-				Customer cc = gson.fromJson(
+				Product cc = gson.fromJson(
 						EntityUtils.toString(response.getEntity()),
-						Customer.class);
+						Product.class);
 				return cc;
 			} else {
 				System.err.println(EntityUtils.toString(response.getEntity()));
@@ -56,10 +56,10 @@ public class CustomerClient {
 		return null;
 	}
 
-	public static Customer update(Customer customer) {
-		HttpPost httppost = new HttpPost(API_URL + customer.getCode());
+	public static Product update(Product product) {
+		HttpPost httppost = new HttpPost(API_URL + product.getCode());
 		try {
-			StringEntity se = new StringEntity(gson.toJson(customer));
+			StringEntity se = new StringEntity(gson.toJson(product));
 			se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,
 					"application/json"));
 			httppost.setHeader(new BasicHeader(HTTP.CONTENT_TYPE,
@@ -72,7 +72,7 @@ public class CustomerClient {
 			if (response.getStatusLine().getStatusCode() == 200) {
 				return gson.fromJson(
 						EntityUtils.toString(response.getEntity()),
-						Customer.class);
+						Product.class);
 			} else {
 				System.err.println(EntityUtils.toString(response.getEntity()));
 			}
@@ -82,7 +82,7 @@ public class CustomerClient {
 		return null;
 	}
 
-	public static Customer get(String code) {
+	public static Product get(String code) {
 		HttpGet httpget = new HttpGet(API_URL + code);
 		try {
 
@@ -95,7 +95,7 @@ public class CustomerClient {
 			if (response.getStatusLine().getStatusCode() == 200) {
 				return gson.fromJson(
 						EntityUtils.toString(response.getEntity()),
-						Customer.class);
+						Product.class);
 			} else {
 				System.err.println(EntityUtils.toString(response.getEntity()));
 			}
@@ -125,7 +125,7 @@ public class CustomerClient {
 		return false;
 	}
 
-	public static List<Customer> fetchAllCustomers() {
+	public static List<Product> fetchAllProducts() {
 		HttpGet httpget = new HttpGet(API_URL);
 		try {
 
@@ -138,7 +138,7 @@ public class CustomerClient {
 			if (response.getStatusLine().getStatusCode() == 200) {
 				return gson.fromJson(
 						EntityUtils.toString(response.getEntity()),
-						new TypeToken<List<Customer>>() {
+						new TypeToken<List<Product>>() {
 						}.getType());
 			} else {
 				System.err.println(EntityUtils.toString(response.getEntity()));

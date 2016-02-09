@@ -7,7 +7,7 @@ import java.util.List;
 public class Customer implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private Long id;
+	
 	private String code;
 	private String name;
 	private String address;
@@ -15,14 +15,6 @@ public class Customer implements Serializable {
 	private String phone2;
 	private Long creditLimit = 0L;
 	private Long currentLimit = 0L;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	public String getCode() {
 		return code;

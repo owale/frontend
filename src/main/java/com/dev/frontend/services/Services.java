@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dev.frontend.model.Customer;
+import com.dev.frontend.model.Product;
 import com.dev.frontend.panels.ComboBoxItem;
 import com.dev.frontend.services.impl.CustomerClient;
+import com.dev.frontend.services.impl.ProductClient;
 
 public class Services {
 	public static final int TYPE_PRODUCT = 1;
@@ -27,6 +29,9 @@ public class Services {
 		switch (objectType) {
 		case TYPE_CUSTOMER:
 			result = CustomerClient.create((Customer) object);
+			break;
+		case TYPE_PRODUCT:
+			result = ProductClient.create((Product) object);
 			break;
 
 		default:
@@ -51,6 +56,9 @@ public class Services {
 		case TYPE_CUSTOMER:
 			result = CustomerClient.get(code);
 			break;
+		case TYPE_PRODUCT:
+			result = ProductClient.get(code);
+			break;
 
 		default:
 			break;
@@ -72,7 +80,9 @@ public class Services {
 		case TYPE_CUSTOMER:
 			result = CustomerClient.delete(code);
 			break;
-
+		case TYPE_PRODUCT:
+			result = ProductClient.delete(code);
+			break;
 		default:
 			break;
 		}
@@ -90,6 +100,9 @@ public class Services {
 		switch (objectType) {
 		case TYPE_CUSTOMER:
 			result = CustomerClient.fetchAllCustomers();
+			break;
+		case TYPE_PRODUCT:
+			result = ProductClient.fetchAllProducts();
 			break;
 
 		default:
@@ -110,11 +123,15 @@ public class Services {
 	}
 
 	public static double getProductPrice(String productCode) {
-		// TODO by the candidate
+		// by the candidate
 		/*
 		 * This method is used to get unit price of product with the code passed
 		 * as a parameter
 		 */
-		return 1;
+		Product product = ProductClient.get(productCode);
+		if (product != null) {
+			return product.getPrice();
+		}
+		return 0;
 	}
 }

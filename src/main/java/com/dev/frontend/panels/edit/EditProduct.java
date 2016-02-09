@@ -7,18 +7,18 @@ import java.awt.Insets;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import com.dev.frontend.model.Customer;
+import com.dev.frontend.model.Product;
 import com.dev.frontend.services.Services;
 
-public class EditProduct extends EditContentPanel
-{
+public class EditProduct extends EditContentPanel {
 	private static final long serialVersionUID = -8971249970444644844L;
 	private JTextField txtCode = new JTextField();
 	private JTextField txtDescription = new JTextField();
 	private JTextField txtQuantity = new JTextField();
 	private JTextField txtPrice = new JTextField();
 
-	public EditProduct()
-	{
+	public EditProduct() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		setLayout(gridBagLayout);
 
@@ -79,46 +79,69 @@ public class EditProduct extends EditContentPanel
 		txtQuantity.setColumns(10);
 	}
 
-	public boolean bindToGUI(Object o) 
-	{
-		// TODO by the candidate
+	public boolean bindToGUI(Object o) {
+		// by the candidate
 		/*
-		 * This method use the object returned by Services.readRecordByCode and should map it to screen widgets 
+		 * This method use the object returned by Services.readRecordByCode and
+		 * should map it to screen widgets
 		 */
+		if (o != null && o instanceof Product) {
+			Product product = (Product) o;
+			txtCode.setText(product.getCode());
+			txtDescription.setText(product.getDescription());
+			txtPrice.setText(String.valueOf(product.getPrice()));
+			txtQuantity.setText(String.valueOf(product.getQuantity()));
+			return true;
+		}
 		return false;
 	}
 
-	public Object guiToObject() 
-	{
-		// TODO by the candidate
+	public Object guiToObject() {
+		// by the candidate
 		/*
-		 * This method collect values from screen widgets and convert them to object of your type
-		 * This object will be used as a parameter of method Services.save
+		 * This method collect values from screen widgets and convert them to
+		 * object of your type This object will be used as a parameter of method
+		 * Services.save
 		 */
-		return null;
+		Product product = new Product();
+		Double price;
+		try {
+			price = Double.valueOf(txtPrice.getText());
+		} catch (Exception e) {
+			price = 0.0;
+		}
+		Integer quantity;
+		try {
+			quantity = Integer.valueOf(txtQuantity.getText());
+		} catch (Exception e) {
+			quantity = 0;
+		}
+
+		product.setCode(txtCode.getText());
+		product.setDescription(txtDescription.getText());
+		product.setPrice(price);
+		product.setQuantity(quantity);
+
+		return product;
 	}
 
-	public int getObjectType()
-	{
+	public int getObjectType() {
 		return Services.TYPE_PRODUCT;
 	}
 
 	@Override
-	public String getCurrentCode()
-	{
+	public String getCurrentCode() {
 		return txtCode.getText();
 	}
 
-	public void clear()
-	{
+	public void clear() {
 		txtCode.setText("");
 		txtDescription.setText("");
 		txtPrice.setText("");
 		txtQuantity.setText("");
 	}
 
-	public void onInit()
-	{
+	public void onInit() {
 
 	}
 }

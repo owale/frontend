@@ -19,7 +19,7 @@ public class CustomerDataModel extends ListDataModel {
 
 	@Override
 	public String[][] convertRecordsListToTableModel(List<Object> list) {
-		// TODO by the candidate
+		// by the candidate
 		/*
 		 * This method use list returned by Services.listCurrentRecords and
 		 * should convert it to array of rows each row is another array of
