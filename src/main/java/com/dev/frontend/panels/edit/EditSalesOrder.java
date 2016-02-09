@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -19,12 +20,15 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.DefaultTableModel;
 
+import com.dev.frontend.model.Customer;
+import com.dev.frontend.model.OrderLine;
+import com.dev.frontend.model.Product;
+import com.dev.frontend.model.SalesOrder;
 import com.dev.frontend.panels.ComboBoxItem;
 import com.dev.frontend.services.Services;
 import com.dev.frontend.services.Utils;
 
-public class EditSalesOrder extends EditContentPanel
-{
+public class EditSalesOrder extends EditContentPanel {
 	private static final long serialVersionUID = -8971249970444644844L;
 	private JTextField txtOrderNum = new JTextField();
 	private JTextField txtTotalPrice = new JTextField();
@@ -32,21 +36,19 @@ public class EditSalesOrder extends EditContentPanel
 	private JTextField txtQuantity = new JTextField();
 	private JButton btnAddLine = new JButton("Add");
 	private JComboBox<ComboBoxItem> txtProduct = new JComboBox<ComboBoxItem>();
-	private DefaultTableModel defaultTableModel = new DefaultTableModel(new String[] { "Product", "Qty", "Price", "Total" }, 0)
-	{
+	private DefaultTableModel defaultTableModel = new DefaultTableModel(
+			new String[] { "Product", "Qty", "Price", "Total" }, 0) {
 
 		private static final long serialVersionUID = 7058518092777538239L;
 
 		@Override
-		public boolean isCellEditable(int row, int column)
-		{
+		public boolean isCellEditable(int row, int column) {
 			return false;
 		}
 	};
 	private JTable lines = new JTable(defaultTableModel);
 
-	public EditSalesOrder()
-	{
+	public EditSalesOrder() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		setLayout(gridBagLayout);
 
@@ -170,25 +172,22 @@ public class EditSalesOrder extends EditContentPanel
 		gbc.weighty = 1;
 		gbc.ipady = 40;
 		gbc.fill = GridBagConstraints.BOTH;
-		JScrollPane scrollPane = new JScrollPane(lines, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+		JScrollPane scrollPane = new JScrollPane(lines,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		lines.setFillsViewportHeight(true);
 		add(scrollPane, gbc);
-		btnAddLine.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnAddLine.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				addRow();
 			}
 		});
 
 	}
 
-	public void addRow()
-	{
+	public void addRow() {
 		ComboBoxItem comboBoxItem = (ComboBoxItem) txtProduct.getSelectedItem();
-		if (comboBoxItem == null)
-		{
+		if (comboBoxItem == null) {
 			JOptionPane.showMessageDialog(this, "You must select a product");
 			return;
 
@@ -196,51 +195,95 @@ public class EditSalesOrder extends EditContentPanel
 		String productCode = comboBoxItem.getKey();
 		double price = Services.getProductPrice(productCode);
 		Integer qty = 0;
-		try
-		{
+		try {
 			qty = Integer.parseInt(txtQuantity.getText());
-		}
-		catch (Exception e)
-		{
-			JOptionPane.showMessageDialog(this, "Invalid number format in Qty field");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this,
+					"Invalid number format in Qty field");
 			return;
 		}
 		double totalPrice = qty * price;
-		defaultTableModel.addRow(new String[] { productCode, "" + qty, "" + price, "" + totalPrice });
+		defaultTableModel.addRow(new String[] { productCode, "" + qty,
+				"" + price, "" + totalPrice });
 		double currentValue = Utils.parseDouble(txtTotalPrice.getText());
 		currentValue += totalPrice;
 		txtTotalPrice.setText("" + currentValue);
 	}
-	
+
 	public boolean bindToGUI(Object o) {
-		// TODO by the candidate
+		// by the candidate
 		/*
-		 * This method use the object returned by Services.readRecordByCode and should map it to screen widgets 
+		 * This method use the object returned by Services.readRecordByCode and
+		 * should map it to screen widgets
 		 */
+		if (o != null && o instanceof SalesOrder) {
+			SalesOrder salesOrder = (SalesOrder) o;
+			txtOrderNum.setText(String.valueOf(salesOrder.getOrderNumber()));
+			txtCustomer.setSelectedItem(new ComboBoxItem(salesOrder
+					.getCustomer().getCode(), salesOrder.getCustomer()
+					.getName()));
+			txtTotalPrice.setText(String.valueOf(salesOrder.getTotalPrice()));
+
+			for (OrderLine oline : salesOrder.getOrderLines()) {
+				defaultTableModel.addRow(new String[] {
+						oline.getProduct().getCode(), "" + oline.getQuantity(),
+						"" + oline.getProduct().getPrice(),
+						"" + salesOrder.getTotalPrice() });
+			}
+
+			return true;
+		}
 		return false;
 	}
 
 	public Object guiToObject() {
-		// TODO by the candidate
+		// by the candidate
 		/*
-		 * This method collect values from screen widgets and convert them to object of your type
-		 * This object will be used as a parameter of method Services.save
+		 * This method collect values from screen widgets and convert them to
+		 * object of your type This object will be used as a parameter of method
+		 * Services.save
 		 */
-		return null;
+
+		SalesOrder order = new SalesOrder();
+		Double totalPrice;
+		try {
+			totalPrice = Double.valueOf(txtTotalPrice.getText());
+		} catch (Exception e) {
+			totalPrice = 0.0;
+		}
+
+		order.setOrderNumber(txtOrderNum.getText());
+		ComboBoxItem item = (ComboBoxItem) txtCustomer.getSelectedItem();
+		order.setCustomer(new Customer(item.getKey(), item.getValue()));
+		order.setTotalPrice(totalPrice);
+		
+		List<OrderLine> orderLines = new ArrayList<OrderLine>();
+		int orderLinesCount = defaultTableModel.getRowCount();
+		for (int i = 0; i < orderLinesCount; i++) {
+			Product prd = new Product(String.valueOf(defaultTableModel
+					.getValueAt(i, 0)));
+			Integer quantity = Integer.valueOf(String.valueOf(defaultTableModel
+					.getValueAt(i, 1)));
+			OrderLine orderLine = new OrderLine(prd, quantity);
+
+			orderLines.add(orderLine);
+		}
+
+		order.setOrderLines(orderLines);
+
+		return order;
+
 	}
 
-	public int getObjectType()
-	{
+	public int getObjectType() {
 		return Services.TYPE_SALESORDER;
 	}
 
-	public String getCurrentCode()
-	{
+	public String getCurrentCode() {
 		return txtOrderNum.getText();
 	}
 
-	public void clear()
-	{
+	public void clear() {
 		txtOrderNum.setText("");
 		txtCustomer.removeAllItems();
 		txtProduct.removeAllItems();
@@ -249,13 +292,14 @@ public class EditSalesOrder extends EditContentPanel
 		defaultTableModel.setRowCount(0);
 	}
 
-	public void onInit()
-	{
-		List<ComboBoxItem> customers = Services.listCurrentRecordRefernces(Services.TYPE_CUSTOMER);
+	public void onInit() {
+		List<ComboBoxItem> customers = Services
+				.listCurrentRecordRefernces(Services.TYPE_CUSTOMER);
 		for (ComboBoxItem item : customers)
 			txtCustomer.addItem(item);
 
-		List<ComboBoxItem> products = Services.listCurrentRecordRefernces(Services.TYPE_PRODUCT);
+		List<ComboBoxItem> products = Services
+				.listCurrentRecordRefernces(Services.TYPE_PRODUCT);
 		for (ComboBoxItem item : products)
 			txtProduct.addItem(item);
 	}

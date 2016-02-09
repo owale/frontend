@@ -11,6 +11,13 @@ public class Product implements Serializable {
 	private Double price;
 	private Integer quantity;
 
+	public Product() {
+	}
+
+	public Product(String code) {
+		this.code = code;
+	}
+
 	public String getCode() {
 		return code;
 	}
@@ -43,4 +50,8 @@ public class Product implements Serializable {
 		this.quantity = quantity;
 	}
 
+	@Override
+	public String toString() {
+		return this.description;
+	}
 }

@@ -25,6 +25,9 @@ public class CustomerDataModel extends ListDataModel {
 		 * should convert it to array of rows each row is another array of
 		 * columns of the row
 		 */
+		if (list.isEmpty()) {
+			return new String[][] { { "", "", "", "" } };
+		}
 		String[][] data = new String[list.size()][4];
 
 		for (int i = 0; i < list.size(); i++) {

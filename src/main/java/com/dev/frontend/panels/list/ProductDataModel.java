@@ -27,6 +27,10 @@ public class ProductDataModel extends ListDataModel {
 		 * columns of the row
 		 */
 
+		if (list.isEmpty()) {
+			return new String[][] { { "", "", "", "" } };
+		}
+
 		String[][] data = new String[list.size()][4];
 
 		for (int i = 0; i < list.size(); i++) {
